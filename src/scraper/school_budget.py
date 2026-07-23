@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class SchoolBudget:
-    id: int
-    year: int 
+    id: str
+    year: str 
     name: str 
     term: str
     subprogram: Optional[str]
