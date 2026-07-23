@@ -8,5 +8,5 @@ class ScraperConfig:
     def __init__(self):
         load_dotenv(Path("../.env"))
         self.ULR: Final[str | None] = os.getenv("URL")
-        self.USER: Final[str | None] = os.getenv("USER_LOGIN")
-        self.PASSWORD: Final[str | None] = os.getenv("USER_PASSWORD") 
+        self.USER_LOGIN: Final[str | None] = os.getenv("USER_LOGIN")
+        self.USER_PASSWORD: Final[str | None] = os.getenv("USER_PASSWORD") 
