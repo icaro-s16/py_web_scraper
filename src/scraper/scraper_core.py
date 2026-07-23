@@ -100,7 +100,7 @@ def __execute_pagination(
                 value="//li[contains(@class, 'page-item active')]/button"
             ).text
     
-    return cur_page == next_page
+    return not ( cur_page == next_page ) 
     
 
 
