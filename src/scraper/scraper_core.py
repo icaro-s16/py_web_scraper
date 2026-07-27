@@ -104,9 +104,9 @@ def __extract_schools_budget(
         )
     
     for school_row in schools_table_rows:
-        cells: List[WebElement] = driver.find_elements(
-            by=By.XPATH, 
-            value="//td[@class='fw-500']"
+        cells: List[WebElement] = school_row.find_elements(
+            by=By.TAG_NAME, 
+            value="td"
         )
         if len(cells) < 4: continue
         schools_budget.append(
@@ -123,9 +123,9 @@ def __extract_schools_budget(
 
 
 def __execute_pagination(
-        driver: WebDriver, 
-        cur_page: str
-        ) -> Tuple[bool, str]:
+        driver: WebDriver,
+        expected_page: int 
+        ) -> bool:
     
     actions: ActionChains = ActionChains(driver=driver)
     actions.scroll_to_element(
@@ -147,15 +147,15 @@ def __execute_pagination(
             EC.element_to_be_clickable((By.XPATH, "//li[@class='page-item active']/button[@class='page-link']"))
         )
     
-    next_page: str = driver.find_element(
+    cur_page: int = int(driver.find_element(
             by=By.XPATH,
             value="//li[@class='page-item active']/button[@class='page-link']"
-        ).text
+        ).text)
     
-    return (not ( cur_page == next_page ), next_page)
+    return not ( expected_page == cur_page )
     
 
-def scraper_run() -> List[SchoolBudget]:
+def scraper_run(expected_page: int) -> List[SchoolBudget]:
     service = Service(ChromeDriverManager().install())
     config = ScraperConfig()
     driver = webdriver.Chrome(service=service)
@@ -167,8 +167,6 @@ def scraper_run() -> List[SchoolBudget]:
     __enter_budget_page(driver=driver)
 
     should_run: bool = True
-    cur_page: str = "0"
-
     schools_budget: List[SchoolBudget] = []
 
     while should_run:
@@ -183,9 +181,9 @@ def scraper_run() -> List[SchoolBudget]:
 
         schools_budget += cur_schools_budget
 
-        should_run, cur_page = __execute_pagination(
+        should_run = __execute_pagination(
             driver=driver,
-            cur_page=cur_page
+            expected_page=expected_page
         )
    
     driver.quit()
