@@ -9,16 +9,16 @@ def _get_schools_budget_dict(schools_budget: List[SchoolBudget]) -> Optional[Dic
     if not len(schools_budget):
         return None 
 
-    pattern: Pattern = r"(?:s|S)oftware?s | (?:t|T)ecnologia?s | (?:s|S)istema?s"
+    pattern: Pattern = r"Tecnológicos|Software|Sistema|Tecnologia"
     
     res: Dict[str, List[str]] = {key:[] for key in vars(schools_budget[0]).keys()}
     for school_budget in schools_budget:
         school_budget: Dict[str, str] = vars(school_budget)
 
-        if not regex.match(pattern=pattern, string=school_budget["subprogram"]): continue
+        if not regex.search(pattern=pattern, string=school_budget["subprogram"]): continue
 
-        for key in schools_budget.keys():
-            res[key].append(schools_budget[key])
+        for key in school_budget.keys():
+            res[key].append(school_budget[key])
 
     return res 
 
@@ -32,5 +32,5 @@ def get_csv_results(csv_name:str, schools_budget: List[SchoolBudget]) -> None:
         _get_schools_budget_dict(schools_budget)
     )
 
-    print(f"LOG: The content was successfully created into data{csv_name}")
-    df.to_csv(f"../../data/{csv_name}.csv")
+    print(f"INFO: The content was successfully created into data/{csv_name}")
+    df.to_csv(f"../data/{csv_name}.csv")

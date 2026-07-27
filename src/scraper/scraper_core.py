@@ -104,14 +104,17 @@ def __extract_schools_budget(
         )
     
     for school_row in schools_table_rows:
-        cells: str = (school_row.text).split()
+        cells: List[WebElement] = driver.find_elements(
+            by=By.XPATH, 
+            value="//td[@class='fw-500']"
+        )
         if len(cells) < 4: continue
         schools_budget.append(
             SchoolBudget(
-                id=cells[0],
-                year=cells[1],
-                name=cells[2],
-                term=cells[3],
+                id=cells[0].text,
+                year=cells[1].text,
+                name=cells[2].text,
+                term=cells[3].text,
                 subprogram=None
             )
         )
@@ -149,7 +152,7 @@ def __execute_pagination(
             value="//li[@class='page-item active']/button[@class='page-link']"
         ).text
     
-    return (not ( "2" == next_page ), cur_page)
+    return (not ( "5" == next_page ), cur_page)
     
 
 def scraper_run() -> List[SchoolBudget]:
