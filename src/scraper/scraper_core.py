@@ -4,6 +4,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.remote.webelement import WebElement
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from scraper.scraper_config import ScraperConfig
 from typing import List
 from scraper.school_budget import SchoolBudget
@@ -18,9 +21,18 @@ def __submit_login(
     login_box: WebElement = driver.find_element(by=By.ID, value="document")
     password_box: WebElement = driver.find_element(by=By.ID, value="password")
     login_box.send_keys(config.USER_LOGIN)
-    login_box.submit()
     password_box.send_keys(config.USER_PASSWORD)
     password_box.submit()
+
+def __enter_budget_page(
+        driver: WebDriver
+        ) -> None:
+
+    budget_button: WebElement = driver.find_element(
+        by=By.XPATH,
+        value="//a[@href='/compras/orcamentos'][@role='button']"
+    )
+    budget_button.click()
 
 
 
@@ -28,24 +40,36 @@ def __extract_schools_subprogram(
         driver: WebDriver, 
         schools_budget: List[SchoolBudget]
         ) -> None:
-    
+
+    WebDriverWait(driver=driver, timeout=10).until(
+        EC.visibility_of_all_elements_located((By.XPATH, "//button[@class='btn btn-primary']"))
+        )
     visualize_buttons: List[WebElement] = driver.find_elements(
-            by=By.CLASS_NAME,
-            value="btn btn-primary"
-        )
-
-    for index, button in enumerate(visualize_buttons):
-        button.click()
-
-        content_box: WebElement = driver.find_element(
             by=By.XPATH,
-            value="//div[contains(@class, 'col-12 mb-3')]/span[text(), 'Sub-Programa']"
+            value="//button[@class='btn btn-primary']"
         )
+    actions: ActionChains = ActionChains(driver=driver)
+    for index, button in enumerate(visualize_buttons):
+        actions.scroll_to_element(button)
+        button.click()
+        WebDriverWait(driver=driver, timeout=10).until(
+            EC.visibility_of_element_located((By.XPATH, "//div[@class='col-12 mb-3']/strong"))
+            )
 
-        schools_budget[index].subprogram = content_box.find_element(
-            by=By.TAG_NAME,
-            value="strong"
-        ).text 
+        schools_budget[index].subprogram = driver.find_element(
+            by=By.XPATH,
+            value="//div[@class='col-12 mb-3']/strong"
+        ).text
+        print(schools_budget[index].subprogram)
+        WebDriverWait(driver=driver, timeout=10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@class='btn btn-outline-danger me-auto']"))
+            )
+        close_button: WebElement = driver.find_element(
+            by=By.XPATH,
+            value="//button[@class='btn btn-outline-danger me-auto']"
+        )
+        close_button.click()
+
 
        
 
@@ -56,26 +80,23 @@ def __extract_schools_budget(
     
     schools_budget: List[SchoolBudget]= []
 
-    schools_table_rows: WebElement = driver.find_elements(
-            by=By.XPATH,
-            value="//table[contains(@class, 'table table-hover border')]/tbody/tr"
+    WebDriverWait(driver=driver, timeout=10).until(
+        EC.visibility_of_all_elements_located((By.XPATH, "//button[@class='btn btn-primary']"))
         )
-
+    schools_table_rows: List[WebElement] = driver.find_elements(
+            by=By.XPATH,
+            value="//tbody/tr"
+        )
+    
     for school_row in schools_table_rows:
-        school_cells: List[WebElement] = school_row.find_elements(
-                by=By.TAG_NAME,
-                value="td"
-            )
-
-        if len(school_cells) < 4:
-            continue
-
+        cells: str = (school_row.text).split()
+        if len(cells) < 4: continue
         schools_budget.append(
             SchoolBudget(
-                id=school_cells[0].text,
-                year=school_cells[1].text,
-                name=school_cells[2].text,
-                term=school_cells[3].txt,
+                id=cells[0],
+                year=cells[1],
+                name=cells[2],
+                term=cells[3],
                 subprogram=None
             )
         )
@@ -87,34 +108,39 @@ def __execute_pagination(
         driver: WebDriver, 
         cur_page: str
         ) -> bool:
-    
+
+    WebDriverWait(driver=driver, timeout=10).until(
+        EC.element_to_be_clickable((By.XPATH, "//button[@class='page-link']"))
+        )
     pagination_buttons: List[WebElement] = driver.find_elements(
             by=By.XPATH,
-            value="//button[contains(@class, 'page-link')"
+            value="//button[@class='page-link']"
         )
 
     pagination_buttons[len(pagination_buttons) - 2].click()
 
+    WebDriverWait(driver=driver, timeout=10).until(
+        EC.element_to_be_clickable((By.XPATH, "//li[@class='page-item active']/button"))
+        )
+    
     next_page: str = driver.find_element(
                 by=By.XPATH,
-                value="//li[contains(@class, 'page-item active')]/button"
+                value="//li[@class='page-item active']/button"
             ).text
     
     return not ( cur_page == next_page ) 
     
 
-
-
-
 def scraper_run() -> List[SchoolBudget]:
     service = Service(ChromeDriverManager().install())
-    config = ScraperConfig(service=service)
-    driver = webdriver.Chrome()
+    config = ScraperConfig()
+    driver = webdriver.Chrome(service=service)
     #Provide a longer timeout to search for an element
     driver.implicitly_wait(30)
 
     driver.get(config.ULR)
     __submit_login(driver=driver, config=config)
+    __enter_budget_page(driver=driver)
 
     should_run: bool = True
     cur_page: str = "0"
