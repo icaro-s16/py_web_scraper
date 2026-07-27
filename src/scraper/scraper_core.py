@@ -152,7 +152,7 @@ def __execute_pagination(
             value="//li[@class='page-item active']/button[@class='page-link']"
         ).text
     
-    return (not ( "5" == next_page ), cur_page)
+    return (not ( cur_page == next_page ), next_page)
     
 
 def scraper_run() -> List[SchoolBudget]:
