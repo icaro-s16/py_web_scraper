@@ -1,12 +1,12 @@
-from typing import Optional
+from typing      import Optional
 from dataclasses import dataclass
 
 @dataclass
 class SchoolBudget:
-    id: str
-    year: str 
-    name: str 
-    term: str
+    id:         str
+    year:       str 
+    name:       str 
+    term:       str
     subprogram: Optional[str]
 
     def __str__(self) -> str:

@@ -1,15 +1,15 @@
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver
-from selenium.webdriver.webkitgtk.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome                import ChromeDriverManager
+from selenium                                import webdriver
+from selenium.webdriver.webkitgtk.webdriver  import WebDriver
+from selenium.webdriver.common.by            import By
+from selenium.webdriver.chrome.service       import Service
+from selenium.webdriver.remote.webelement    import WebElement
+from selenium.webdriver.support.wait         import WebDriverWait
+from selenium.webdriver.support              import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from scraper.scraper_config import ScraperConfig
-from typing import List, Final, Tuple
-from scraper.school_budget import SchoolBudget
+from scraper.scraper_config                  import ScraperConfig
+from typing                                  import List, Final, Tuple
+from scraper.school_budget                   import SchoolBudget
 
 
 TIME_OUT: Final[int] = 10

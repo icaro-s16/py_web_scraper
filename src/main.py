@@ -1,7 +1,7 @@
-from scraper.scraper_core import scraper_run
-from scraper.school_budget import SchoolBudget
-from typing import List
-from formatter.format import get_csv_results
+from scraper.scraper_core   import scraper_run
+from scraper.school_budget  import SchoolBudget
+from typing                 import List
+from formatter.format       import get_csv_results
 
 if __name__ == "__main__":
     start_page: int = int(input("Enter the starting page:"))
