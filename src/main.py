@@ -4,13 +4,24 @@ from typing import List
 from formatter.format import get_csv_results
 
 if __name__ == "__main__":
-    expected_page: int = int(input("Which page do you want to go to?\n>"))
-    schools_budget: List[SchoolBudget] = scraper_run(expected_page=expected_page)
-    csv_name: str = input("Choose a name to save the results (the file will already have a .csv extension)\n>")
+    start_page: int = int(input("Enter the starting page:"))
+    final_page: int = int(input("Enter the targed page:"))
+
+    if (start_page > final_page):
+        raise RuntimeError("Error: The start page must be greater than the target page.")
+
+    start_page -= 1
+    final_page += 1 
+
+    schools_budget: List[SchoolBudget] = scraper_run(
+        start_page=start_page, 
+        final_page=final_page
+    )
+    csv_name: str = input("CSV filename (no .csv needed):")
     get_csv_results(
-            csv_name, 
-            schools_budget
-        )
+        csv_name, 
+        schools_budget
+    )
 
 
 

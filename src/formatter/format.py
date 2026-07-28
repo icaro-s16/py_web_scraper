@@ -32,5 +32,5 @@ def get_csv_results(csv_name:str, schools_budget: List[SchoolBudget]) -> None:
         __get_schools_budget_dict(schools_budget)
     )
 
-    print(f"INFO: The content was successfully created into data/{csv_name}")
+    print(f"[INFO] The content was successfully created into data/{csv_name}")
     df.to_csv(f"../data/{csv_name}.csv")
