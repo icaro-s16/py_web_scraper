@@ -5,7 +5,7 @@ from scraper.school_budget import SchoolBudget
 import re as regex
 from re import Pattern
 
-def __get_schools_budget_dict(schools_budget: List[SchoolBudget]) -> Optional[Dict[str:List[str]]]:
+def __get_schools_budget_dict(schools_budget: List[SchoolBudget]) -> Optional[Dict[str, List[str]]]:
     if not len(schools_budget):
         return None 
 
