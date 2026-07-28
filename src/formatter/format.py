@@ -29,7 +29,7 @@ def get_csv_results(csv_name:str, schools_budget: List[SchoolBudget]) -> None:
         return 
     
     df: DataFrame = pd.DataFrame.from_dict(
-        _get_schools_budget_dict(schools_budget)
+        __get_schools_budget_dict(schools_budget)
     )
 
     print(f"INFO: The content was successfully created into data/{csv_name}")
