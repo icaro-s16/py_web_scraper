@@ -35,8 +35,7 @@ def get_csv_results(csv_name:str, schools_budget: List[SchoolBudget]) -> None:
     )
 
     script_abpath: str = str(path.abspath(__file__))
-    paths: List[str] = script_abpath.split("\\")
-    paths = [path for index, path in enumerate(paths) if index < len(paths) - 3] 
+    paths: List[str] = [path for index, path in enumerate(script_abpath.split("\\")) if index < len(paths) - 3] 
     paths.append("data/")
     data_abpath: str = "/".join(paths)
     df.to_csv(f"{data_abpath}/{csv_name}.csv")
