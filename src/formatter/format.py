@@ -1,9 +1,11 @@
 import pandas as pd
 import re     as regex
+from os                     import path
 from pandas                 import DataFrame
 from typing                 import List, Dict, Optional 
 from scraper.school_budget  import SchoolBudget
 from re                     import Pattern
+
 
 def __get_schools_budget_dict(schools_budget: List[SchoolBudget]) -> Optional[Dict[str, List[str]]]:
     if not len(schools_budget):
@@ -32,5 +34,10 @@ def get_csv_results(csv_name:str, schools_budget: List[SchoolBudget]) -> None:
         __get_schools_budget_dict(schools_budget)
     )
 
-    print(f"[INFO] The content was successfully created into data/{csv_name}")
-    df.to_csv(f"../data/{csv_name}.csv")
+    print(f"[INFO] The content was successfully created into data/{csv_name}.csv")
+
+    script_abpath: str = str(path.abspath(__file__))
+    paths: List[str] = script_abpath.split("\\")
+    paths = [path for index, path in enumerate(paths) if index < len(paths) - 3] 
+    paths.append("data/")
+    df.to_csv(f"{"/".join(paths)}{csv_name}.csv")

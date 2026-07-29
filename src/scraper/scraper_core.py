@@ -276,6 +276,7 @@ def scraper_run(
 
         should_run, cur_page = __execute_pagination(
             driver=driver,
+            cur_page=cur_page,
             final_page=final_page
         )
 
