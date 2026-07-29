@@ -34,10 +34,11 @@ def get_csv_results(csv_name:str, schools_budget: List[SchoolBudget]) -> None:
         __get_schools_budget_dict(schools_budget)
     )
 
-    print(f"[INFO] The content was successfully created into data/{csv_name}.csv")
-
     script_abpath: str = str(path.abspath(__file__))
     paths: List[str] = script_abpath.split("\\")
     paths = [path for index, path in enumerate(paths) if index < len(paths) - 3] 
     paths.append("data/")
-    df.to_csv(f"{"/".join(paths)}{csv_name}.csv")
+    data_abpath: str = "/".join(paths)
+    df.to_csv(f"{data_abpath}/{csv_name}.csv")
+    print(f"[INFO] The content was successfully created into {data_abpath}")
+    
