@@ -8,7 +8,7 @@ if __name__ == "__main__":
     final_page: int = int(input("Enter the targed page:"))
 
     if (start_page > final_page):
-        raise RuntimeError("Error: The start page must be greater than the target page.")
+        raise RuntimeError("[Error] The start page must be greater than the target page.")
 
     start_page -= 1
     final_page += 1 

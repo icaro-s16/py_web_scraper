@@ -134,6 +134,7 @@ def __extract_schools_budget(
 
 def __execute_pagination(
         driver: WebDriver,
+        cur_page: int,
         final_page: int 
     ) -> Tuple[bool, int]:
     
@@ -161,14 +162,14 @@ def __execute_pagination(
         )
     )
     
-    cur_page: int = int(
+    active_page: int = int(
         driver.find_element(
             by=By.XPATH,
             value="//li[@class='page-item active']/button[@class='page-link']"
         ).text
     )
     
-    return (not ( final_page == cur_page ), cur_page)
+    return (not ( final_page == active_page or active_page == cur_page ), active_page)
 
 def __navigate_to_start_page(
         driver: WebDriver, 
@@ -176,16 +177,56 @@ def __navigate_to_start_page(
         cur_page: int 
     ) -> int:
     print(f"[INFO] Navigating to page {start_page + 1}...")
-    for _ in range(start_page):
+
+    should_search: bool = True
+    while should_search:
         WebDriverWait(driver=driver, timeout=TIME_OUT).until(
             EC.visibility_of_all_elements_located(
                 (By.XPATH, "//button[@class='btn btn-primary']")
             )
         )
-        _, cur_page = __execute_pagination(
-            driver=driver, 
-            final_page=start_page
+        actions: ActionChains = ActionChains(driver=driver)
+        actions.scroll_to_element(
+            driver.find_element(
+                by=By.XPATH, value="//li[@class='page-item']/button[@class='page-link']"
+            )
+        ).perform()
+        
+        pagination_buttons: List[WebElement] = driver.find_elements(
+            by=By.XPATH,
+            value="//li[@class='page-item']/button[@class='page-link']"
         )
+
+        active_page: int = int(
+            driver.find_element(
+                by=By.XPATH,
+                value="//li[@class='page-item active']/button[@class='page-link']"
+            ).text
+        )
+
+        if active_page > int(pagination_buttons[-3].text):
+            raise RuntimeError("[ERROR] The start page dosent exist..")
+        
+
+        # This initial offset ignores the special pagination buttons  ([<<] | [<] | [>>] | [>])
+        for index in range(3, len(pagination_buttons) - 2):
+            page_num: int = int(
+                pagination_buttons[index].text
+            )
+            if page_num == start_page:
+                WebDriverWait(driver=driver, timeout=TIME_OUT).until(
+                    EC.element_to_be_clickable(pagination_buttons[index])
+                )
+                pagination_buttons[index].click()
+                return page_num
+
+        WebDriverWait(driver=driver, timeout=TIME_OUT).until(
+            EC.element_to_be_clickable(pagination_buttons[-3])
+        )
+
+        pagination_buttons[-3].click()
+        
+
 
     return cur_page
 
@@ -209,7 +250,7 @@ def scraper_run(
     should_run: bool = True
     schools_budget: List[SchoolBudget] = []
 
-    if start_page > 0:
+    if start_page > 1:
         cur_page = __navigate_to_start_page(
             driver=driver, 
             start_page=start_page,
@@ -237,6 +278,9 @@ def scraper_run(
             driver=driver,
             final_page=final_page
         )
+
+        if not should_run and cur_page < final_page:
+            print(f"[INFO] Scraping stopped at {cur_page} before reaching {final_page} because there were no more pages..")
    
     driver.quit()
 
