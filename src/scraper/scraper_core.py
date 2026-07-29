@@ -205,7 +205,7 @@ def __navigate_to_start_page(
         )
 
         if active_page > int(pagination_buttons[-3].text):
-            raise RuntimeError("[ERROR] The start page dosent exist..")
+            raise RuntimeError("[ERROR] The start page doesnt exist..")
         
 
         # This initial offset ignores the special pagination buttons  ([<<] | [<] | [>>] | [>])
